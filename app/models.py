@@ -26,27 +26,4 @@ class User(Base):
     
     
     
-    
-    
-# @router.get("/", response_model=List[schemas.OrderOut])
-# def get_all_orders(db:Session = Depends(get_db)):
-#     orders = db.query(models.Order).all()
-    
-#     return orders
-    
-
-# @router.post("/")
-# def create_order(order:schemas.OrderCreate, db:Session = Depends(get_db)):
-#     new_order = models.Order(**order.dict())
-    
-#     db.add(new_order)
-#     db.commit()
-#     db.refresh(new_order)
-    
-#     return new_order
-    
-    
-# router = APIRouter(
-#     prefix="/orders",
-#     tags=["Orders"]
-# )
+    # pip install pydantic[email]

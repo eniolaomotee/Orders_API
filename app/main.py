@@ -1,16 +1,17 @@
 from fastapi import FastAPI
 from . import models
 from .database import engine
-from .routes import order
+from .routes import order,users
 
 app = FastAPI()
 
-app.include_router(order.router)
+
 
 
 models.Base.metadata.create_all(bind=engine)
 
-
+app.include_router(order.router)
+app.include_router(users.router)
 
 
 @app.get("/")
