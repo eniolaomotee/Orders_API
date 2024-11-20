@@ -1,5 +1,5 @@
 from fastapi import APIRouter,HTTPException,status,Depends
-from .. import models,schemas
+from .. import models,schemas,utils
 from ..database import get_db
 from sqlalchemy.orm import Session
 
@@ -10,9 +10,17 @@ router = APIRouter(
 )
 
 
-@router.post("/", response_model=schemas.UserOut)
+@router.post("/", response_model=schemas.UserOut, status_code=status.HTTP_201_CREATED)
 def create_user(user: schemas.UserCreate, db:Session = Depends(get_db)):
-    new_user =models.User(**user.dict())
+    
+    user_exists = db.query(models.User).filter(models.User.email == user.email).first()
+    
+    if user_exists:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"User with email {user.email} does exist")
+    
+    hashed_password = utils.get_password_hash(user.password)
+    user_dict = user.dict(exclude={'password'})
+    new_user = models.User(**user_dict,password=hashed_password)
     
     db.add(new_user)
     db.commit()

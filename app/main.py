@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from . import models
 from .database import engine
-from .routes import order,users
+from .routes import order,users,auth
+
 
 app = FastAPI()
 
@@ -12,7 +13,7 @@ models.Base.metadata.create_all(bind=engine)
 
 app.include_router(order.router)
 app.include_router(users.router)
-
+app.include_router(auth.router)
 
 @app.get("/")
 def root():
@@ -50,3 +51,9 @@ def root():
 # So let's dive in
 
 # What i've done so far, created our db file and models as well, created our .env as well as our config file for our basesettings
+# Created all the routes for our orders such as the get all orders, get one order, update order, delete order
+# Created routes for user creation and hashed password so that it can be stored in the db
+# Created routes for the user login via the OauthPassword request form, i also verifed that the entered password and the hashed_password are the same else we threw an error if they are not
+
+# to do
+# User login route as well as generating token on user login as well
