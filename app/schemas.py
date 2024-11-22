@@ -43,3 +43,10 @@ class UserOut(BaseModel):
     class Config:
         orm_mode = True
         
+class OrderStatus(BaseModel):
+    published: bool
+    
+
+class Token(BaseModel):
+    access_token: str
+    token_type:str

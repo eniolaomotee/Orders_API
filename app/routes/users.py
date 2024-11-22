@@ -16,7 +16,7 @@ def create_user(user: schemas.UserCreate, db:Session = Depends(get_db)):
     user_exists = db.query(models.User).filter(models.User.email == user.email).first()
     
     if user_exists:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"User with email {user.email} does exist")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"User with email {user.email} does already exist")
     
     hashed_password = utils.get_password_hash(user.password)
     user_dict = user.dict(exclude={'password'})

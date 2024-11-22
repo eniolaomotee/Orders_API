@@ -26,7 +26,7 @@ def create_order(order: schemas.OrderCreate, db:Session = Depends(get_db)):
     
     return new_order
 
-@router.get("/{id}")
+@router.get("/{id}",response_model=schemas.OrderOut)
 def get_single_order(id:int, db:Session=Depends(get_db)):
     
     get_order = db.query(models.Order).filter(models.Order.id == id)
@@ -54,6 +54,21 @@ def delete_order(id: int, db:Session=Depends(get_db)):
     
     return {"message":"Order has been deleted Successfully"}
 
+
+@router.put("/status/{id}",response_model=schemas.OrderOut)
+def update_order_status(id:int,order_update:schemas.OrderStatus, db:Session=Depends(get_db)):
+    order = db.query(models.Order).filter(models.Order.id == id)
+    
+    order_status = order.first()
+    
+    if not order_status:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Order not found")
+    
+    order.update({"published":order_update.published},synchronize_session=False)
+    
+    db.commit()
+    
+    return order.first()
 
 
 
