@@ -17,6 +17,7 @@ class OrderOut(OrderBase):
     published: bool = True
     price: float
     quantity: int
+    owner_id:int
 
 class Order(OrderBase):
     id: int
@@ -50,3 +51,6 @@ class OrderStatus(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type:str
+    
+class TokenData(BaseModel):
+    id: Optional[str] = None

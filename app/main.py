@@ -57,3 +57,9 @@ def root():
 
 # to do
 # User login route as well as generating token on user login as well
+# done with the login route where i used passwordauthform to get the username and password and then login the user, we also encode an access_token for the user and store the id in that token.
+# We also have how we create the token, how we verify the token and extract as well as return the id, 
+# We then use that id to retrieve the current user from the db and make it avaialable to any of our endpoint, we can also use this to protect our routes as well.
+
+# What we want to implement
+# setting up relationships between the tables, so we can query effectively.

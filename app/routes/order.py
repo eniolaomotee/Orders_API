@@ -2,7 +2,7 @@ from fastapi import APIRouter,Depends,HTTPException,status
 from typing import List
 from sqlalchemy.orm import Session
 from ..database import get_db
-from .. import models,schemas
+from .. import models,schemas,oauth
 
 router = APIRouter(
     prefix="/orders",
@@ -17,8 +17,11 @@ def get_all_orders(db:Session = Depends(get_db)):
     return all_orders
 
 @router.post("/", response_model=schemas.Order)
-def create_order(order: schemas.OrderCreate, db:Session = Depends(get_db)):
-    new_order = models.Order(**order.dict())
+def create_order(order: schemas.OrderCreate, db:Session = Depends(get_db), current_user:int = Depends(oauth.get_current_user)):
+    
+    print(current_user.id)
+        
+    new_order = models.Order(owner_id=current_user.id,**order.dict())
     
     db.add(new_order)
     db.commit()
@@ -39,7 +42,7 @@ def get_single_order(id:int, db:Session=Depends(get_db)):
     return new_order
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_order(id: int, db:Session=Depends(get_db)):
+def delete_order(id: int, db:Session=Depends(get_db),current_user = Depends(oauth.get_current_user)):
     order_query = db.query(models.Order).filter(models.Order.id == id)
     
     del_order = order_query.first()
@@ -47,6 +50,9 @@ def delete_order(id: int, db:Session=Depends(get_db)):
     
     if del_order is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Order with id:{id} not found")
+    
+    if del_order.owner_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail=f"Not authorized to delete this order please.")
     
     order_query.delete(synchronize_session=False)
     

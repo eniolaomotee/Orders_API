@@ -1,8 +1,8 @@
 from .database import Base
-from sqlalchemy import Column,String,Integer,Boolean,Float
+from sqlalchemy import Column,String,Integer,Boolean,Float,ForeignKey
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
-from sqlalchemy.orm import relationships
+from sqlalchemy.orm import relationship
 
 
 class Order(Base):
@@ -15,6 +15,9 @@ class Order(Base):
     quantity = Column(Integer,nullable=False)
     order_date = Column(TIMESTAMP(timezone=True),nullable=False,server_default=text('now()'))
     
+    owner_id = Column(Integer,ForeignKey("users.id",ondelete="CASCADE"),nullable=False)
+    
+    # owner = relationship("User")
     
 class User(Base):
     __tablename__ = "users"
@@ -23,6 +26,7 @@ class User(Base):
     email = Column(String,nullable=False,unique=True)
     password = Column(String, nullable=False)
     created_at = Column(TIMESTAMP(timezone=True),nullable=False,server_default=text('now()'))
+    
     
     
     
