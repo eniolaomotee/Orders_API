@@ -84,3 +84,9 @@ def root():
 # We wantt to create a table that then allows users to like a particular type of food, in this table it would be a composite primary key table in the sense that the two columns would be PKs right as well as one user can't like a type of food twice, so for example, User 1 can like any type of food but cannot like it more than once you get.
 
 # This table is going to comprise of our user_id and our order_id
+
+
+# We have to learn about joins in postgres because we'd have to join the orders and the foodlikes tables to get which user liked which order and we do this via joins
+
+
+# So two things after solving this bug for over 30 minutes, a. the name of the column you're redefining let's say count(models.foodlike.order_id) must match what is in the pydantic model you're initiating 

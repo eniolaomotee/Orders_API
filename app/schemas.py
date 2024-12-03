@@ -20,24 +20,19 @@ class UserOut(BaseModel):
 
 
 class OrderOut(OrderBase):
-    id: int
-    order_name: str
-    quantity: str
-    published: bool = True
-    price: float
-    quantity: int
+    id:int
     owner_id:int
     owner: UserOut
-
-class Order(OrderBase):
-    id: int
-    order_name: str
-    order_date: datetime
-    published: bool = True
-    price: float
-    quantity: int
     
+    class Config:
+        from_attributes = True 
 
+
+class OrdersOut(BaseModel):
+    Order: OrderOut
+    likes: int
+    
+    
 class OrderCreate(OrderBase):
     pass
 
@@ -63,3 +58,22 @@ class TokenData(BaseModel):
 class FoodLike(BaseModel):
     order_id : int
     dir: int = Field(..., ge=0, le=1)
+
+
+class Order(OrderBase):
+    id: int
+    order_name: str
+    order_date: datetime
+    published: bool = True
+    price: float
+    quantity: int
+    
+    
+    
+    
+    
+
+
+
+
+

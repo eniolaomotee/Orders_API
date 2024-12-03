@@ -11,14 +11,13 @@ router = APIRouter(
 
 @router.post("/")
 def like_order(like: schemas.FoodLike,db:Session= Depends(get_db), current_user= Depends(oauth.get_current_user)):
-    
-    # get order
+     # get order
     order = db.query(models.Order).filter(models.Order.id == like.order_id).first()
     
     if order is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Order with id:{like.order_id} not found")
 
-    like_query = db.query(models.FoodLike).filter(models.FoodLike.order_id == like.order_id)
+    like_query = db.query(models.FoodLike).filter(models.FoodLike.order_id == like.order_id, models.FoodLike.user_id == current_user.id)
     found_like = like_query.first()
     
     
@@ -34,9 +33,17 @@ def like_order(like: schemas.FoodLike,db:Session= Depends(get_db), current_user=
     
     else:
         if not found_like:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Like does not exist")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Like does not exist for user {current_user.id} on order {like.order_id}")
         
         like_query.delete(synchronize_session=False)
         db.commit()
         
         return {"message":"Like has been deleted successfully"}
+    
+    
+    
+    
+    
+    
+    
+# db.query(models.Order, func.count(models.FoodLike.order_id).label("orders")).join(models.FoodLike, models.FoodLike.order_id == models.Order.id,isouter=True).group_by(models.Order.id)

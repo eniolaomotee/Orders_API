@@ -15,9 +15,9 @@ class Order(Base):
     quantity = Column(Integer,nullable=False)
     order_date = Column(TIMESTAMP(timezone=True),nullable=False,server_default=text('now()'))
     
-    owner_id = Column(Integer,ForeignKey("users.id",ondelete="CASCADE"),nullable=False)
+    owner_id = Column(Integer,ForeignKey("users.id",ondelete="CASCADE"),nullable=False) # We created a FK so as to match the owner_id to the users id
     
-    owner = relationship("User")
+    owner = relationship("User") #Here we created a relationship between the orders and the user, so that we can output which user has which order.
     
 class User(Base):
     __tablename__ = "users"

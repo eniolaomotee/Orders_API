@@ -4,18 +4,23 @@ from sqlalchemy.orm import Session
 from ..database import get_db
 from typing import Optional
 from .. import models,schemas,oauth
-
+from sqlalchemy import func
 router = APIRouter(
     prefix="/orders",
     tags=["Orders"]
 )
 
 # get all orders, create_order, get single order, delete order, update order
-@router.get("/", response_model=List[schemas.OrderOut])
+@router.get("/",response_model=List[schemas.OrdersOut])
 def get_all_orders(db:Session = Depends(get_db), current_user=Depends(oauth.get_current_user), limit:int = 100, skip: int = 0, search: Optional[str] = ""):
     all_orders = db.query(models.Order).filter(models.Order.order_name.contains(search)).limit(limit).offset(skip).all()
 
-    return all_orders
+    # How to hjoin in sqlalchemy
+    results = db.query(models.Order, func.count(models.FoodLike.order_id).label("likes")).join(models.FoodLike,models.FoodLike.order_id == models.Order.id, isouter=True).group_by(models.Order.id).limit(limit).offset(skip).all()
+    
+    print(results)
+     
+    return results
 
 @router.post("/", response_model=schemas.Order)
 def create_order(order: schemas.OrderCreate, db:Session = Depends(get_db), current_user:int = Depends(oauth.get_current_user)):
