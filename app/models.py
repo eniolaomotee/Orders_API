@@ -17,7 +17,7 @@ class Order(Base):
     
     owner_id = Column(Integer,ForeignKey("users.id",ondelete="CASCADE"),nullable=False)
     
-    # owner = relationship("User")
+    owner = relationship("User")
     
 class User(Base):
     __tablename__ = "users"
@@ -27,7 +27,12 @@ class User(Base):
     password = Column(String, nullable=False)
     created_at = Column(TIMESTAMP(timezone=True),nullable=False,server_default=text('now()'))
     
+class FoodLike(Base):
+    __tablename__ = "foodlikes"
     
+    user_id = Column(Integer,ForeignKey("users.id",ondelete="CASCADE"),primary_key=True)
+    order_id = Column(Integer,ForeignKey("orders.id",ondelete="CASCADE"),primary_key=True)
     
+
     
     # pip install pydantic[email]

@@ -1,4 +1,4 @@
-from pydantic import BaseModel,EmailStr
+from pydantic import BaseModel,EmailStr,Field
 from datetime import datetime
 from typing import Optional
 
@@ -10,6 +10,15 @@ class OrderBase(BaseModel):
     price: float
     quantity: int
     
+class UserOut(BaseModel):
+    id:int
+    email: EmailStr
+    created_at: datetime
+    
+    class Config:
+        from_attributes = True
+
+
 class OrderOut(OrderBase):
     id: int
     order_name: str
@@ -18,6 +27,7 @@ class OrderOut(OrderBase):
     price: float
     quantity: int
     owner_id:int
+    owner: UserOut
 
 class Order(OrderBase):
     id: int
@@ -36,13 +46,7 @@ class UserCreate(BaseModel):
     email: EmailStr
     password: str
     
-class UserOut(BaseModel):
-    id:int
-    email: EmailStr
-    created_at: datetime
-    
-    class Config:
-        orm_mode = True
+
         
 class OrderStatus(BaseModel):
     published: bool
@@ -54,3 +58,8 @@ class Token(BaseModel):
     
 class TokenData(BaseModel):
     id: Optional[str] = None
+    
+
+class FoodLike(BaseModel):
+    order_id : int
+    dir: int = Field(..., ge=0, le=1)

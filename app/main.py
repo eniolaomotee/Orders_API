@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from . import models
 from .database import engine
-from .routes import order,users,auth
+from .routes import order,users,auth,foodlikes
 
 
 app = FastAPI()
@@ -14,6 +14,8 @@ models.Base.metadata.create_all(bind=engine)
 app.include_router(order.router)
 app.include_router(users.router)
 app.include_router(auth.router)
+app.include_router(foodlikes.router)
+
 
 @app.get("/")
 def root():
@@ -62,4 +64,23 @@ def root():
 # We then use that id to retrieve the current user from the db and make it avaialable to any of our endpoint, we can also use this to protect our routes as well.
 
 # What we want to implement
-# setting up relationships between the tables, so we can query effectively.
+# setting up relationships between the tables, so we can query effectively. So we created a field called owner_id, this sets a link between the orders and users table, making sure that the users can order anything can we can keep track of which user has which order you get, so we can also protect some of our routes if we need users to filter based on if they are logged in or if their IDs correlate to the current_user which we're getting from the token which we embedded their id at 
+
+# We also want to be able to delete and update oorders based on users, so user A would only be able to update Order B which he created and not order C which he didn't create, so that's what we mean when we protect our routes.
+
+# We want to get the users who made a particular order and to do this we'd use relationships
+# Setting a realtionship: it would tell SQL to fetch some data based off their relationships, so let's say we have our Orders if we want to get the Users who created this when we get the posts we'd need to use realtionships
+
+
+
+# Query Parameters
+
+# Limit to limit number of records returned, we can also use it for pagination
+# skip which is offset , this is used to skip a specific number of records
+# filter by using search to match desired query string
+# % means space in your URL
+
+
+# We wantt to create a table that then allows users to like a particular type of food, in this table it would be a composite primary key table in the sense that the two columns would be PKs right as well as one user can't like a type of food twice, so for example, User 1 can like any type of food but cannot like it more than once you get.
+
+# This table is going to comprise of our user_id and our order_id

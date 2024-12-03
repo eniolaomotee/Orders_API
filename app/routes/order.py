@@ -2,6 +2,7 @@ from fastapi import APIRouter,Depends,HTTPException,status
 from typing import List
 from sqlalchemy.orm import Session
 from ..database import get_db
+from typing import Optional
 from .. import models,schemas,oauth
 
 router = APIRouter(
@@ -11,16 +12,14 @@ router = APIRouter(
 
 # get all orders, create_order, get single order, delete order, update order
 @router.get("/", response_model=List[schemas.OrderOut])
-def get_all_orders(db:Session = Depends(get_db)):
-    all_orders = db.query(models.Order).all()
-    
+def get_all_orders(db:Session = Depends(get_db), current_user=Depends(oauth.get_current_user), limit:int = 100, skip: int = 0, search: Optional[str] = ""):
+    all_orders = db.query(models.Order).filter(models.Order.order_name.contains(search)).limit(limit).offset(skip).all()
+
     return all_orders
 
 @router.post("/", response_model=schemas.Order)
 def create_order(order: schemas.OrderCreate, db:Session = Depends(get_db), current_user:int = Depends(oauth.get_current_user)):
-    
-    print(current_user.id)
-        
+            
     new_order = models.Order(owner_id=current_user.id,**order.dict())
     
     db.add(new_order)
@@ -30,7 +29,7 @@ def create_order(order: schemas.OrderCreate, db:Session = Depends(get_db), curre
     return new_order
 
 @router.get("/{id}",response_model=schemas.OrderOut)
-def get_single_order(id:int, db:Session=Depends(get_db)):
+def get_single_order(id:int, db:Session=Depends(get_db), current_user = Depends(oauth.get_current_user)):
     
     get_order = db.query(models.Order).filter(models.Order.id == id)
     
@@ -70,6 +69,7 @@ def update_order_status(id:int,order_update:schemas.OrderStatus, db:Session=Depe
     if not order_status:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Order not found")
     
+    
     order.update({"published":order_update.published},synchronize_session=False)
     
     db.commit()
@@ -79,15 +79,21 @@ def update_order_status(id:int,order_update:schemas.OrderStatus, db:Session=Depe
 
 
 
-@router.put("/{id}")
-def update_order(id:int,order:schemas.OrderCreate,db:Session=Depends(get_db)):
+@router.put("/{id}",response_model=schemas.OrderOut)
+def update_order(id:int,order:schemas.OrderCreate,db:Session=Depends(get_db), current_user= Depends(oauth.get_current_user)):
     
     order_query = db.query(models.Order).filter(models.Order.id == id)
     
     updated_order = order_query.first()
     
+    
+    print(updated_order)
+    
     if updated_order is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Order with id:{id} not found")
+    
+    if updated_order.owner_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail=f"Not authorized to update this order.")
     
     
     order_query.update(order.dict(),synchronize_session=False)
